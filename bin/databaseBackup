@@ -9,7 +9,7 @@ require $scriptPath . '/vendor/autoload.php';
 $config = require $scriptPath . '/config.php';
 $fullPath = $config['full_path'];
 
-$sqlDumper = new \Insurance\SqlDumper($fullPath);
+$sqlDumper = new \Insurance\SqlDumper($config['database']);
 $sqlFile = $sqlDumper->dumpSql($tmpPath);
 
 $generator = new \Insurance\ArchiveGenerator($tmpPath, $config['website_name'], \Insurance\ArchiveGenerator::DATABASE_BACKUP);

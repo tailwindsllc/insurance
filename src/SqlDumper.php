@@ -4,16 +4,19 @@ namespace Insurance;
 
 class SqlDumper
 {
-    public function __construct($pathToWPConfig)
+    protected $database;
+
+    public function __construct(array $database)
     {
-        // We need to require the file.
-        require $pathToWPConfig . '/wp-config.php';
+        $this->database = $database;
     }
 
     public function dumpSql($dumpPath)
     {
-        $sqlFile = $dumpPath . '/' . DB_NAME . '.sql';
-        exec('mysqldump -u ' . DB_USER . ' --password="' . DB_PASSWORD . '" -h ' . DB_HOST . ' ' . DB_NAME . ' > ' . $sqlFile);
+        $database = $this->database;
+
+        $sqlFile = $dumpPath . '/' . $database['name'] . '.sql';
+        exec('mysqldump -u ' . $database['user'] . ' --password="' . $database['pass'] . '" -h ' . $database['host'] . ' ' . $database['name'] . ' > ' . $sqlFile);
         return $sqlFile;
     }
 }

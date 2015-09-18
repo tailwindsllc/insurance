@@ -22,9 +22,7 @@ foreach($config['exclude_files'] as $file) {
 
 $files = [];
 
-require $fullPath . '/wp-config.php';
-
-$sqlDumper = new \Insurance\SqlDumper($fullPath);
+$sqlDumper = new \Insurance\SqlDumper($config['database']);
 $sqlFile = $sqlDumper->dumpSql($tmpPath);
 
 foreach ($include as $file) {

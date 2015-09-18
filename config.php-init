@@ -36,4 +36,11 @@ return [
 
     'backup_times' => '06:00',
 
+    'database' => [
+        'host' => '',
+        'user' => '',
+        'pass' => '',
+        'name' => '',
+    ],
+
 ];

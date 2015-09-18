@@ -1,0 +1,39 @@
+<?php
+
+return [
+
+    'website_name' => '',
+
+    'full_path' => '',
+
+    'include_files' => [
+        'wp-config.php',
+        'wp-content/',
+    ],
+
+    'exclude_files' => [
+        'wp-content/cache/',
+    ],
+
+    'amazon' => [
+        'key' => '',
+        'secret' => '',
+        'region' => 'us-west-1',
+        'bucket' => '',
+        'path' => '',
+    ],
+
+    'backup_rules' => [
+        'database' => 10,
+        'full' => 5,
+    ],
+
+    'backup_dates' => [
+        // Sunday = 0, Monday = 1, etc.
+        'database' => '0123456',
+        'full' => '3',
+    ],
+
+    'backup_times' => '06:00',
+
+];

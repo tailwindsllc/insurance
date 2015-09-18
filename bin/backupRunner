@@ -1,0 +1,61 @@
+#!/env/php
+<?php
+
+$scriptPath = realpath(__DIR__ . '/..');
+
+require $scriptPath . '/vendor/autoload.php';
+
+$config = require $scriptPath . '/config.php';
+
+$runtimeTimestamp = strtotime(date('Y-m-d') . $config['backup_times']);
+$runtimeHour = date('G', $runtimeTimestamp);
+
+$currentHour = date('G');
+
+if ($runtimeHour != $currentHour) {
+    exit('Not time yet.');
+}
+
+// First, let's evaluate database backup rules
+
+$databaseRunDays = $config['backup_dates']['database'];
+
+$doWeRun = determineIfWeRunToday($databaseRunDays);
+
+if ($doWeRun) {
+    exec('php ' . $scriptPath . '/bin/databaseBackup');
+}
+
+// Next, let's evaluate full files
+
+$databaseRunDays = $config['backup_dates']['full'];
+
+$doWeRun = determineIfWeRunToday($databaseRunDays);
+
+if ($doWeRun) {
+    exec('php ' . $scriptPath . '/bin/fullBackup');
+}
+
+// Now, let's manage the backups.
+exec('php ./manageBackups');
+
+// Helper functions.
+function determineIfWeRunToday($daysToRun)
+{
+    $length = strlen($daysToRun);
+
+    // No days, we don't run.
+    if(!$length) {
+        return false;
+    }
+
+    for($i = 0; $i < $length; $i++) {
+        $day = $daysToRun[$i];
+
+        if(date('w') == $day) {
+            return true;
+        }
+    }
+
+    return false;
+}

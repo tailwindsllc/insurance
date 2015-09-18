@@ -1,0 +1,26 @@
+#!/env/php
+<?php
+
+$scriptPath = realpath(__DIR__ . '/..');
+$tmpPath = realpath($scriptPath . '/tmp');
+
+require $scriptPath . '/vendor/autoload.php';
+
+$config = require $scriptPath . '/config.php';
+$fullPath = $config['full_path'];
+
+$sqlDumper = new \Insurance\SqlDumper($fullPath);
+$sqlFile = $sqlDumper->dumpSql($tmpPath);
+
+$generator = new \Insurance\ArchiveGenerator($tmpPath, $config['website_name'], \Insurance\ArchiveGenerator::DATABASE_BACKUP);
+
+$generator->addFile($sqlFile, $tmpPath);
+$generator->close();
+
+$backupName = $generator->getArchiveName();
+
+$uploader = new Insurance\AmazonUploader($config['amazon']);
+$uploader->upload($backupName, $tmpPath . '/' . $backupName);
+
+unlink($tmpPath . '/' . $backupName);
+unlink($sqlFile);

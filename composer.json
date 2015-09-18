@@ -1,0 +1,18 @@
+{
+    "name": "tailwindsllc/insurance",
+    "description": "A backup system for WordPress and other web assets.",
+    "require": {
+        "league/flysystem-aws-s3-v3": "^1.0"
+    },
+    "authors": [
+        {
+            "name": "Brandon Savage",
+            "email": "brandon@brandonsavage.net"
+        }
+    ],
+    "autoload": {
+      "psr-4": {
+        "Insurance\\": "src/"
+      }
+    }
+}

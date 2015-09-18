@@ -1,0 +1,14 @@
+#!/env/php
+<?php
+
+$scriptPath = realpath(__DIR__ . '/..');
+$tmpPath = realpath($scriptPath . '/tmp');
+
+require $scriptPath . '/vendor/autoload.php';
+
+$config = require $scriptPath . '/config.php';
+
+$uploader = new Insurance\AmazonUploader($config['amazon']);
+
+$manager = new \Insurance\BackupManager($uploader, $config['backup_rules']);
+$manager->manageBackups();

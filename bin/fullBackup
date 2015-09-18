@@ -1,0 +1,71 @@
+#!/env/php
+<?php
+
+$scriptPath = realpath(__DIR__ . '/..');
+$tmpPath = realpath($scriptPath . '/tmp');
+
+require $scriptPath . '/vendor/autoload.php';
+
+$config = require $scriptPath . '/config.php';
+$fullPath = $config['full_path'];
+
+$include = [];
+$exclude = [];
+
+foreach($config['include_files'] as $file) {
+    $include[] = $fullPath . '/' . $file;
+}
+
+foreach($config['exclude_files'] as $file) {
+    $exclude[] = $fullPath . '/' . $file;
+}
+
+$files = [];
+
+require $fullPath . '/wp-config.php';
+
+$sqlDumper = new \Insurance\SqlDumper($fullPath);
+$sqlFile = $sqlDumper->dumpSql($tmpPath);
+
+foreach ($include as $file) {
+    if (is_dir($file)) {
+        $files = array_merge($files, getDirFiles($file));
+    } else {
+        $files[] = $file;
+    }
+}
+
+foreach($exclude as $filterOut) {
+    $files = array_filter($files, function($element) use ($filterOut) { return ( strpos($element, $filterOut) === false); });
+}
+
+$generator = new \Insurance\ArchiveGenerator($tmpPath, $config['website_name'], \Insurance\ArchiveGenerator::FULL_BACKUP);
+
+$generator->addFiles($files, $fullPath);
+
+// Add the SQL file.
+$generator->addFile($sqlFile, $tmpPath);
+$generator->close();
+
+$uploader = new Insurance\AmazonUploader($config['amazon']);
+$uploader->upload($generator->getArchiveName(), $tmpPath . '/' . $generator->getArchiveName());
+
+unlink($tmpPath . '/' . $generator->getArchiveName());
+unlink($sqlFile);
+
+function getDirFiles($fullPath)
+{
+    $files = array();
+    $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($fullPath));
+
+    while($it->valid()) {
+
+        if (!$it->isDot()) {
+            $files[] = $it->getPathname();
+        }
+
+        $it->next();
+    }
+
+    return $files;
+}

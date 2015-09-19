@@ -1,6 +1,8 @@
 #!/env/php
 <?php
 
+$options = getopt("fb");
+
 $scriptPath = realpath(__DIR__ . '/..');
 
 require $scriptPath . '/vendor/autoload.php';
@@ -12,10 +14,14 @@ $runtimeHour = date('G', $runtimeTimestamp);
 
 $currentHour = date('G');
 
-if ($runtimeHour != $currentHour) {
-    exit('Not time yet.');
-}
+if(!isset($options['f'])) {
 
+    if ($runtimeHour != $currentHour) {
+        exit('Not time yet.');
+    }
+
+    exec('cd ' . $scriptPath . '; git pull origin master');
+}
 // First, let's evaluate database backup rules
 
 $databaseRunDays = $config['backup_dates']['database'];
@@ -42,6 +48,12 @@ exec('php ./manageBackups');
 // Helper functions.
 function determineIfWeRunToday($daysToRun)
 {
+    global $options;
+
+    if(isset($options['b'])) {
+        return true;
+    }
+
     $length = strlen($daysToRun);
 
     // No days, we don't run.

@@ -37,6 +37,13 @@ Finally, you can specify the day and time of the backup. The system uses the def
 The backup rules section determines how many of each type of backup will be retained. It's recommended to keep 10 days
 of database-only backups, and five weeks of full filesystem backups.
 
+##License
+This software is licensed under the MIT license. Use it as you would like.
+
+Note that this software is **not** subject to the GPL, because it doesn't use any WordPress-specific code, functions,
+APIs or methods. Even though it's intended for WordPress websites, it is NOT WordPress-specific, and thus is not
+required to be GPL-licensed.
+
 ##Questions?
 
 Feel free to reach out via email or file an issue!

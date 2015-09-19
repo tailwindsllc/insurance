@@ -9,6 +9,21 @@ require $scriptPath . '/vendor/autoload.php';
 $config = require $scriptPath . '/config.php';
 $fullPath = $config['full_path'];
 
+if (isset($config['log_level'])) {
+    $logLevel = $config['log_level'];
+} else {
+    $logLevel = \Monolog\Logger::WARNING;
+}
+
+// Configure logging and BooBoo
+$log = new \Monolog\Logger('name');
+$log->pushHandler(new \Monolog\Handler\StreamHandler($scriptPath . '/backup.log', $logLevel));
+
+$booboo = new League\BooBoo\Runner();
+$booboo->pushFormatter(new \League\BooBoo\Formatter\CommandLineFormatter());
+$booboo->pushHandler(new \League\BooBoo\Handler\LogHandler($log));
+$booboo->register();
+
 $include = [];
 $exclude = [];
 
@@ -22,9 +37,11 @@ foreach($config['exclude_files'] as $file) {
 
 $files = [];
 
+$log->addDebug('Dumping the database.');
 $sqlDumper = new \Insurance\SqlDumper($config['database']);
 $sqlFile = $sqlDumper->dumpSql($tmpPath);
 
+$log->addDebug('Iterating over the file system.');
 foreach ($include as $file) {
     if (is_dir($file)) {
         $files = array_merge($files, getDirFiles($file));
@@ -33,23 +50,31 @@ foreach ($include as $file) {
     }
 }
 
+$log->addDebug('Excluding files');
 foreach($exclude as $filterOut) {
     $files = array_filter($files, function($element) use ($filterOut) { return ( strpos($element, $filterOut) === false); });
 }
 
 $generator = new \Insurance\ArchiveGenerator($tmpPath, $config['website_name'], \Insurance\ArchiveGenerator::FULL_BACKUP);
 
+$log->addDebug('Adding files to the archive');
 $generator->addFiles($files, $fullPath);
 
 // Add the SQL file.
+$log->addDebug('Adding the SQL file to the archive');
 $generator->addFile($sqlFile, $tmpPath);
 $generator->close();
 
+$log->addDebug('Uploading to Amazon');
 $uploader = new Insurance\AmazonUploader($config['amazon']);
 $uploader->upload($generator->getArchiveName(), $tmpPath . '/' . $generator->getArchiveName());
 
+$log->addDebug('Removing temporary files');
 unlink($tmpPath . '/' . $generator->getArchiveName());
 unlink($sqlFile);
+
+$log->addDebug('Done!');
+
 
 function getDirFiles($fullPath)
 {

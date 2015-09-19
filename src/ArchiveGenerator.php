@@ -43,6 +43,11 @@ class ArchiveGenerator
 
     public function addFile($filePath, $erase = '')
     {
+        if (is_dir($filePath)) {
+            $this->zip->addEmptyDir(str_replace($erase, '', $filePath));
+            return;
+        }
+
         if($filePath == $erase) {
             throw new \InvalidArgumentException('The file path and the path to be removed cannot be identical');
         }

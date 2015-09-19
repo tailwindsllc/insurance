@@ -20,7 +20,8 @@ if(!isset($options['f'])) {
         exit('Not time yet.');
     }
 
-    exec('cd ' . $scriptPath . '; git pull origin master');
+    // Let's make sure we're up to date with the latest version.
+    exec('cd ' . $scriptPath . '; git pull origin master; composer install --no-interaction --no-dev --prefer-dist');
 }
 // First, let's evaluate database backup rules
 

@@ -2,7 +2,8 @@
     "name": "tailwindsllc/insurance",
     "description": "A backup system for WordPress and other web assets.",
     "require": {
-        "league/flysystem-aws-s3-v3": "^1.0"
+        "league/flysystem-aws-s3-v3": "^1.0",
+        "monolog/monolog": "^1.17"
     },
     "authors": [
         {

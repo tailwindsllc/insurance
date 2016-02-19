@@ -44,7 +44,7 @@ if ($doWeRun) {
 }
 
 // Now, let's manage the backups.
-exec('php ./manageBackups');
+exec('php ' . $scriptPath . '/bin/manageBackups');
 
 // Helper functions.
 function determineIfWeRunToday($daysToRun)
